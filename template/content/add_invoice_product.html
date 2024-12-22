@@ -1,0 +1,10 @@
+<h1>إضافة منتج إلى الفاتورة {{ invoice.invoice_number }}</h1>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+    <button type="submit">إضافة المنتج</button>
+</form>
+
+<a href="{% url 'invoice_detail' pk=invoice.id %}">العودة إلى تفاصيل الفاتورة</a>

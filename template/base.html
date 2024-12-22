@@ -1,0 +1,164 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم إدارة المخزون والمبيعات</title>
+    <!-- ربط Bootstrap 5 من شبكة CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet"> <!-- أيقونات FontAwesome -->
+    <link rel="stylesheet" href="{% static 'css/darkmod.css' %}">
+    <style>
+        /* تحسين التنسيق للجداول */
+        .table th, .table td {
+            vertical-align: middle;
+        }
+
+        /* تحسين التنسيق في الجداول للأجهزة المحمولة */
+        @media (max-width: 767px) {
+            .table th, .table td {
+                font-size: 12px;
+                padding: 8px;
+            }
+
+            .table {
+                font-size: 14px;
+            }
+
+            .table thead {
+                display: none; /* إخفاء الرأس لجعل الجدول أكثر سهولة في القراءة */
+            }
+
+            .table tr {
+                display: block;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+            }
+
+            .table td {
+                display: block;
+                text-align: right;
+                padding-left: 50%; /* لإضافة محاذاة للبيانات على اليمين */
+                position: relative;
+            }
+
+            .table td:before {
+                /* إضافة تسمية قبل كل خلية لتعريفها */
+                content: attr(data-label);
+                position: absolute;
+                right: 10px;
+                font-weight: bold;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+            }
+        }
+
+        /* الشريط الجانبي */
+        .offcanvas {
+            max-width: 250px;
+        }
+
+        .card-header {
+            font-size: 1.25rem;
+            font-weight: bold;
+        }
+
+        /* إضافة تعديل لشريط التنقل لضمان مرونته */
+        .navbar-toggler-icon {
+            background-color: #fff;
+        }
+        .chart-section {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .chart-container {
+            width: 48%;
+            margin-bottom: 20px;
+        }
+        /* تخصيص التنسيق على الشاشات الصغيرة */
+        @media (max-width: 768px) {
+            .chart-container {
+                width: 100%;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    <!-- الهيدر مع شعار الشركة -->
+    <nav class="navbar navbar-expand-lg bg-dark">
+        <div class="container-fluid d-flex flex-row justify-content-between">
+            <!-- الشعار -->
+            <a class="col-3" href="#">
+                <img src="https://via.placeholder.com/150x40.png?text=Logo" width="80"> <!-- ضع رابط الشعار هنا -->
+            </a>
+            <div class="col-4 d-flex flex-row grid-gap gap-3">
+         <!-- زر الوضع الليلي مع تغيير الأيقونة -->
+              <button id="toggleDarkMode" class="btn btn-outline-none w-50">
+                 <i id="darkModeIcon" class="fas fa-moon text-warning"></i> <!-- أيقونة القمر للوضع الليلي -->
+               </button>
+                <!-- زر فتح الشريط الجانبي على الشاشات الصغيرة -->
+                <button class="btn btn-primary d-md-none w-50" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasSidebar" aria-controls="offcanvasSidebar">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- الشريط الجانبي (Offcanvas) يظهر دائمًا على الشاشات الكبيرة -->
+    <div class="offcanvas offcanvas-start offcanvas-lg" tabindex="-1" id="offcanvasSidebar" aria-labelledby="offcanvasSidebarLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasSidebarLabel">لوحة التحكم</h5>
+            <button type="button" class="btn-close text-reset d-md-none" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="list-unstyled">
+                <li><a href="{% url 'home' %}"  class="text-decoration-none text-light py-2 d-block"><i class="fas fa-tachometer-alt"></i> الصفحة الرئيسية</a></li>
+                <li><a href="{% url 'product_list' %}"class="text-decoration-none text-light py-2 d-block"><i class="fas fa-cogs"></i> إدارة المخزون</a></li>
+                <li><a href="{% url 'invoice_list' %}" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-chart-line"></i> إدارة المبيعات</a></li>
+                <li><a href="{% url 'customer_list' %}" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-users"></i> إدارة العملاء</a></li>
+                <li><a href="#" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-file-alt"></i> التقارير</a></li>
+                <li><a href="#" class="text-decoration-none text-light py-2 d-block"><css/darkmod.cssi class="fas fa-cogs"></i> الإعدادات</a></li>
+            </ul>
+        </div>
+    </div>
+    <div class="col-lg-11 col-12 ">
+        <div class="row">
+            <!-- الشريط الجانبي يظهر دائمًا في الشاشات الكبيرة (عرض ثابت بجانب المحتوى) -->
+            <div class="col-md-3 d-none d-md-block">
+                <!-- الشريط الجانبي ثابت بجانب المحتوى في الشاشات الكبيرة -->
+                <div class="p-3 text-white" style="height: 100vh; background-color: rgba(12, 19, 37, 0.884);">
+                    <ul class="list-unstyled">
+                        <li><a href="{% url 'home' %}" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-tachometer-alt"></i> الصفحة الرئيسية</a></li>
+                        <li><a href="{% url 'product_list' %}" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-cogs"></i> إدارة المخزون</a></li>
+                        <li><a href="{% url 'invoice_list' %}" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-chart-line"></i> إدارة المبيعات</a></li>
+                        <li><a href="{% url 'customer_list' %}" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-users"></i> إدارة العملاء</a></li>
+                        <li><a href="#" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-file-alt"></i> التقارير</a></li>
+                        <li><a href="#" class="text-decoration-none text-light py-2 d-block"><i class="fas fa-cogs"></i> الإعدادات</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            {% block content%}
+
+
+
+            {% endblock %}
+            
+        </div>
+    </div>
+    <!-- ربط Bootstrap و JavaScript من CDN -->
+     <!-- إضافة Bootstrap JS و Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js"></script>
+
+    <!-- إضافة JavaScript لتبديل الوضع الليلي 
+    <script src="{% static 'js/darkmod.js' %}"></script>-->
+
+</body>
+</html>

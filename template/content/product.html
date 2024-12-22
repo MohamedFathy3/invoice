@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-12 col-md-9 px-3 mt-3">
+    <div class="container mt-3">
+        <h3 class="text-end">إدارة المنتجات</h3>
+        <div class="col-12 col-md-4 ">
+            <div class="card text-white bg-success">
+                <div class="card-header">المخزون الحالي</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ total_products }} منتج</h5>
+                    <p class="card-text">إجمالي سعر المخزون: {{ total_stock_value }} ج.م</p>
+                </div>
+            </div>
+        </div>
+          
+        {% if success_message %}
+            <div class="alert alert-success">{{ success_message }}</div>
+        {% endif %}
+
+        <div class="d-flex justify-content-between align-items-center py-3">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
+                إضافة منتج جديد
+            </button>
+        </div>
+
+  
+        <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>اسم المنتج</th>
+                    <th>الكمية</th>
+                    <th>السعر</th>
+                    <th>إجمالي السعر</th>
+                    <th>العمليات</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.name }}</td>
+                    <td>{{ product.quantity }}</td>
+                    <td>{{ product.price }} ج.م</td>
+                    <td>{{ product.total_price }} ج.م</td>
+                    <td>
+                        <!-- زر التعديل لفتح نافذة التعديل -->
+                        <button type="button" class="btn btn-warning btn-sm"
+                                data-bs-toggle="modal" data-bs-target="#editProductModal"
+                                data-id="{{ product.id }}"
+                                data-name="{{ product.name }}"
+                                data-quantity="{{ product.quantity }}"
+                                data-price="{{ product.price }}">
+                            تعديل
+                        </button>
+
+                        <!-- زر الحذف -->
+                        <form method="POST" action="{% url 'product_list' %}" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="product_id" value="{{ product.id }}">
+                            <button type="submit" name="delete_product" class="btn btn-danger btn-sm">حذف</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- نافذة إضافة منتج جديد -->
+        <div class="modal fade" id="addProductModal" tabindex="-1" aria-labelledby="addProductModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addProductModalLabel">إضافة منتج جديد</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="POST" action="{% url 'product_list' %}">
+                            {% csrf_token %}
+                            {{ form_add.as_p }}
+                            <button type="submit" name="add_product" class="btn btn-success w-100">إضافة المنتج</button>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!-- نافذة تعديل المنتج -->
+<div class="modal fade" id="editProductModal" tabindex="-1" aria-labelledby="editProductModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editProductModalLabel">تعديل المنتج</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'product_list' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="product_id" id="product-id" value="">
+                    <div class="mb-3">
+                        <label for="productName" class="form-label">اسم المنتج</label>
+                        <input type="text" class="form-control" id="productName" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productQuantity" class="form-label">الكمية</label>
+                        <input type="number" class="form-control" id="productQuantity" name="quantity" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="productPrice" class="form-label">السعر</label>
+                        <input type="number" class="form-control" id="productPrice" name="price" required>
+                    </div>
+                    <button type="submit" name="edit_product" class="btn btn-primary w-100">تعديل المنتج</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+        </div>
+    </div>
+</div>
+<script>
+    const editProductModal = document.getElementById('editProductModal');
+    editProductModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;  // الزر الذي تم النقر عليه
+        const productId = button.getAttribute('data-id');
+        const productName = button.getAttribute('data-name');
+        const productQuantity = button.getAttribute('data-quantity');
+        const productPrice = button.getAttribute('data-price');
+
+        // ملء الحقول بالبيانات
+        document.getElementById('product-id').value = productId;
+        document.getElementById('productName').value = productName;
+        document.getElementById('productQuantity').value = productQuantity;
+        document.getElementById('productPrice').value = productPrice;
+    });
+</script>
+{% endblock %}

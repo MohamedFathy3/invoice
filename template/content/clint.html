@@ -1,0 +1,148 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- محتوى الصفحة -->
+    <div class="col-md-9 my-4 px-3">
+        <div class="col-12 text-end fs-4 text-light">
+            <i class="fas fa-users"></i> إدارة العملاء
+        </div>
+        <!-- بطاقة العملاء -->
+        <div class="col-12 col-md-4">
+            <div class="card text-white bg-warning">
+                <div class="card-header">إجمالي العملاء</div>
+                <div class="card-body">
+                    <h5 class="card-title">{{ customers.count }} عميل</h5>
+                    <p class="card-text">عملاء جدد اليوم: {{ new_customers_today }}</p>
+                </div>
+            </div>
+        </div>
+        <br>
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-users"></i> إدارة العملاء
+            </div>
+            <div class="card-body col-12">
+                <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                    <i class="fas fa-plus"></i> إضافة عميل جديد
+                </button>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>اسم العميل</th>
+                                <th>رقم الهاتف</th>
+                                <th>التاريخ</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for customer in customers %}
+                            <tr>
+                                <td>{{ customer.id }}</td>
+                                <td>{{ customer.name }}</td>
+                                <td>{{ customer.phone_number }}</td>
+                                <td>{{ customer.created_at }}</td>
+                                <td>
+                                    <button class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#editCustomerModal"
+                                        data-id="{{ customer.id }}" data-name="{{ customer.name }}" 
+                                        data-phone="{{ customer.phone_number }}">
+                                        <i class="fas fa-edit"></i> تعديل
+                                    </button>
+                                    <form method="POST" action="{% url 'customer_list' %}" style="display:inline;">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                                        <button type="submit" name="delete_customer" class="btn btn-danger btn-sm">
+                                            <i class="fas fa-trash-alt"></i> حذف
+                                        </button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة إضافة عميل جديد -->
+    <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addCustomerModalLabel">إضافة عميل جديد</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form method="POST" action="{% url 'customer_list' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="customerName" class="form-label">اسم العميل</label>
+                            <input type="text" class="form-control" id="customerName" name="name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="customerPhone" class="form-label">رقم الهاتف</label>
+                            <input type="text" class="form-control" id="customerPhone" name="phone_number" required>
+                        </div>
+                        <button type="submit" name="add_customer" class="btn btn-primary">حفظ</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- نافذة تعديل بيانات العميل -->
+<div class="modal fade" id="editCustomerModal" tabindex="-1" aria-labelledby="editCustomerModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCustomerModalLabel">تعديل بيانات العميل</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST" action="{% url 'customer_list' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="customer_id" id="customer-id">
+                    <div class="mb-3">
+                        <label for="editCustomerName" class="form-label">اسم العميل</label>
+                        <input type="text" class="form-control" id="editCustomerName" name="name" value="{{ customer.name }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editCustomerPhone" class="form-label">رقم الهاتف</label>
+                        <input type="text" class="form-control" id="editCustomerPhone" name="phone_number" value="{{ customer.phone_number }}" required>
+                    </div>
+                    <button type="submit" name="edit_customer" class="btn btn-primary">تحديث</button>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    // هذا السكربت يملأ الحقول تلقائيًا عند فتح نافذة التعديل
+    const editCustomerModal = document.getElementById('editCustomerModal');
+    editCustomerModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget; // الزر الذي فتح النافذة
+        const customerId = button.getAttribute('data-id');
+        const customerName = button.getAttribute('data-name');
+        const customerPhone = button.getAttribute('data-phone');
+
+        // تعبئة البيانات في الحقول
+        const customerIdField = document.getElementById('customer-id');
+        const customerNameField = document.getElementById('editCustomerName');
+        const customerPhoneField = document.getElementById('editCustomerPhone');
+
+        customerIdField.value = customerId;
+        customerNameField.value = customerName;
+        customerPhoneField.value = customerPhone;
+    });
+</script>
+
+{% endblock %}

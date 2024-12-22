@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+        <div class="col-md-9 py-4  px-3">
+            <div class="row">
+                <!-- إحصائيات رئيسية -->
+                <div class="col-md-6 mb-4 py-2" style="height: 230px;">
+                    <div class="card bg-primary text-white h-100">
+                        <div class="card-header">إجمالي المبيعات</div>
+                        <div class="card-body stat-card">
+                            <div>
+                                <h4>200,000 ج.م</h4>
+                                <p>مبيعات اليوم: 15,000 ج.م</p>
+                            </div>
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                    </div>
+                </div>
+
+               
+                <div class="col-md-6 mb-4 py-2" style="height: 230px;">
+                    <div class="card bg-success text-white h-100" >
+                        <div class="card-header">المخزون الحالي</div>
+                        <div class="card-body stat-card">
+                            <div>
+                                <h4>{{ total_products }} منتج</h4>
+                                <p class="card-text">إجمالي سعر المخزون: {{ total_stock_value }} ج.م</p>
+                                <p>منتجات منخفضة المخزون: 20</p>
+                            </div>
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4 py-2" style="height: 230px;">
+                    <div class="card bg-warning text-dark h-100">
+                        <div class="card-header">إجمالي العملاء</div>
+                        <div class="card-body stat-card">
+                            <div>
+                                <h4>{{ total_customers }} عميل</h4>
+                                <p class="card-text">عملاء جدد اليوم: {{ new_customers_today }}</p>
+                            </div>
+                            <i class="fas fa-users"></i>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <!-- قسم المخططات -->
+            <div class="chart-section">
+                <div class="chart-container">
+                    <div class="card">
+                        <div class="card-header text-dark">
+                            <i class="fas fa-chart-bar"></i> مخطط المبيعات
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 250px; background-color: #f2f2f2;">
+                                <!-- يمكن إضافة مخطط بياني هنا باستخدام مكتبة مثل Chart.js -->
+                                <p>مخطط المبيعات يمكن أن يظهر هنا.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="card">
+                        <div class="card-header text-dark">
+                            <i class="fas fa-chart-pie"></i> مخطط المخزون
+                        </div>
+                        <div class="card-body">
+                            <div style="height: 250px; background-color: #f2f2f2;">
+                                <!-- يمكن إضافة مخطط بياني هنا باستخدام مكتبة مثل Chart.js -->
+                                <p>مخطط المخزون يمكن أن يظهر هنا.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

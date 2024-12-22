@@ -1,0 +1,34 @@
+<!-- view_invoice.html -->
+<h3>تفاصيل الفاتورة رقم {{ invoice.invoice_number }}</h3>
+
+<p><strong>اسم العميل:</strong> {{ invoice.customer.name }}</p>
+<p><strong>رقم الهاتف:</strong> {{ invoice.customer.phone_number }}</p>
+<p><strong>اسم البائع:</strong> {{ invoice.seller.name }}</p>
+<p><strong>تاريخ الفاتورة:</strong> {{ invoice.date }}</p>
+<p><strong>الإجمالي:</strong>   {{ invoice.total_invoice_price }} </p>
+
+<h4>تفاصيل المنتجات:</h4>
+<table class="table table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>اسم المنتج</th>
+            <th>الكمية</th>
+            <th>السعر</th>
+            <th>الإجمالي</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for invoice_product in invoice_products %}
+            <tr>
+                <td>{{ invoice_product.product.name }}</td>
+                <td>{{ invoice_product.quantity }}</td>
+                <td>{{ invoice_product.price }}</td>
+                <td>{{ invoice_product.total_price }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="4">لا توجد منتجات مرتبطة بهذه الفاتورة</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

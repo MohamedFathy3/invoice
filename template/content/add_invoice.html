@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="col-12 col-md-9 px-3 mt-3">
+    <form method="post">
+        {% csrf_token %}
+        {{ invoice_form.as_p }}
+    
+        <input type="hidden" name="product_count" id="product_count" value="1">
+    
+        <div id="product_forms">
+            {{ product_form.as_p }}
+        </div>
+        <div id="product_forms_container"></div>
+        
+        <button type="button" id="add_product">إضافة منتج</button>
+        <button type="submit">حفظ الفاتورة</button>
+    </form>
+</div>
+
+<script>
+
+document.getElementById('add_product').addEventListener('click', function() {
+    var productFormHTML = document.getElementById('product_forms').innerHTML; // الحصول على محتوى النموذج الحالي
+
+    var newForm = document.createElement('div');
+    newForm.classList.add('product_form'); // إضافة فئة CSS لتنسيق الفورم
+
+    var productCount = document.getElementById('product_count').value; // الحصول على عدد المنتجات الحالي
+
+    // تحديث المحتوى بالفورم الجديد
+    newForm.innerHTML = productFormHTML;
+
+    // تحديث معرّف الحقول لتكون فريدة
+    var inputs = newForm.querySelectorAll('input');
+    inputs.forEach(function(input) {
+        var name = input.getAttribute('name');
+        input.setAttribute('name', name.replace('product_0', `product_${productCount}`)); // تحديث الاسم ليصبح فريدًا
+    });
+
+    // زيادة عداد المنتجات
+    productCount++;
+    document.getElementById('product_count').value = productCount;
+
+    // إضافة الفورم الجديد إلى الحاوية
+    document.getElementById('product_forms_container').appendChild(newForm);
+});
+
+// عند إرسال النموذج
+document.querySelector('form').addEventListener('submit', function(e) {
+    var products = [];
+    
+    // جمع بيانات المنتجات
+    var productForms = document.querySelectorAll('.product_form');
+    productForms.forEach(function(form, index) {
+        var productId = form.querySelector('input[name^="product_"][name$="product_id"]').value;
+        var quantity = form.querySelector('input[name^="product_"][name$="quantity"]').value;
+
+        // إضافة المنتج إلى المصفوفة
+        products.push({
+            product_id: productId,
+            quantity: quantity,
+        });
+    });
+
+    // إضافة بيانات المنتجات إلى الطلب
+    var productDataInput = document.createElement('input');
+    productDataInput.type = 'hidden';
+    productDataInput.name = 'product_data';
+    productDataInput.value = JSON.stringify(products);
+    document.querySelector('form').appendChild(productDataInput);
+});
+</script>
+
+
+{% endblock %}
